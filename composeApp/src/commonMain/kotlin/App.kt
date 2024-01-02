@@ -40,7 +40,7 @@ fun App(networkUtils: PlatformNetworkingUtils) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        deviceIpAddress?.let { Text(it) }
+        deviceIpAddress?.let { Text("Server is listening on $it :: 4001") }
     }
 
 }

@@ -34,6 +34,7 @@ kotlin {
 
         androidMain.dependencies {
             implementation(libs.compose.ui.tooling.preview)
+            implementation(libs.kotlinx.coroutines.core)
             implementation(libs.androidx.activity.compose)
         }
         commonMain.dependencies {
