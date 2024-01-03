@@ -32,6 +32,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import util.PlatformNetworkingUtils
+import util.sendMessage
 import util.startServer
 
 @OptIn(ExperimentalResourceApi::class)
@@ -54,6 +55,16 @@ fun App(networkUtils: PlatformNetworkingUtils) {
             withContext(Dispatchers.IO) {
                 startServer(deviceIpAddress.orEmpty())
             }
+        }
+    }
+
+    LaunchedEffect(clientStarted) {
+        launch(Dispatchers.IO) {
+            sendMessage(
+                message = inputMessage,
+                ipAddress = inputIpAddress,
+                port = inputPort.toInt(),
+            )
         }
     }
 
