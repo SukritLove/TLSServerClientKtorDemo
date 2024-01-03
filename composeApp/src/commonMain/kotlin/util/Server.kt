@@ -1,5 +1,7 @@
 package util
 
+import data.ClientMessage
+import data.MessageData
 import io.ktor.network.selector.SelectorManager
 import io.ktor.network.sockets.aSocket
 import io.ktor.network.sockets.openReadChannel
@@ -15,28 +17,33 @@ suspend fun startServer(ipAddress: String) {
     println("Server Start...")
     println("IpAddress : $ipAddress")
 
-    val selectorManager = SelectorManager(Dispatchers.IO)
-    val serverSocket = aSocket(selectorManager).tcp().bind(ipAddress, 4001)
+    try {
+        val selectorManager = SelectorManager(Dispatchers.IO)
+        val serverSocket = aSocket(selectorManager).tcp().bind(ipAddress, 4001)
 
-    serverSocket.use {
-        println("Server :: Listening at ${serverSocket.localAddress}")
+        serverSocket.use {
+            println("Server :: Listening at ${serverSocket.localAddress}")
 
-        while (true) {
-            val socket = serverSocket.accept()
-            println("Status:: Accepted $socket")
+            while (true) {
+                val socket = serverSocket.accept()
+                println("Status:: Accepted $socket")
 
-            val receiveChannel = socket.openReadChannel()
-            val sendChannel = socket.openWriteChannel(autoFlush = true)
-            try {
-                println(receiveChannel.readUTF8Line())
-                val message: String? = receiveChannel.readUTF8Line()
+                val receiveChannel = socket.openReadChannel()
+                val sendChannel = socket.openWriteChannel(autoFlush = true)
+                try {
 
-                sendChannel.writeStringUtf8("[Receive] your message is \"$message\"")
-            } catch (e: Throwable) {
-                println("Error : $e")
-            } finally {
-                socket.close()
+                    val message: String? = receiveChannel.readUTF8Line()
+                    println(message)
+                    ClientMessage.messages = MessageData(message?: "No message yet")
+                    sendChannel.writeStringUtf8("[Receive] your message is \"$message\"")
+                } catch (e: Throwable) {
+                    println("Error : $e")
+                } finally {
+                    socket.close()
+                }
             }
         }
+    } catch (_e: Throwable) {
+        println("Error $_e")
     }
 }
